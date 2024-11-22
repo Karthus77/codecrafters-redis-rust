@@ -14,7 +14,7 @@ fn main() {
                     if read_count == 0{
                         break;
                     }
-                    stream.write_all(b"+PONG\r\n+PONG\r\n").unwrap();   
+                    stream.write(b"+PONG\r\n+PONG\r\n").unwrap();   
                 }
             }
             Err(e) => {
