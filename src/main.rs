@@ -10,7 +10,7 @@ fn main() {
             Ok(mut stream) => {
                 let mut buf= [0;512];
                 loop {
-                    let read_count = stream.read(&buf).unwrap();
+                    let read_count = stream.read(&mut buf).unwrap();
                     if read_count == 0{
                         break;
                     }
