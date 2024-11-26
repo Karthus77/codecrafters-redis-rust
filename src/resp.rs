@@ -7,6 +7,7 @@ pub enum Value{
     SimpleSrting(String),
     BulkString(String),
     Array(Vec<Value>),
+    Null
 }
 
 impl Value{

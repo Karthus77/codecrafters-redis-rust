@@ -1,3 +1,5 @@
+use std::ptr::null;
+
 use tokio::net::{TcpListener, TcpStream};
 use resp::Value;
 use anyhow::Result;
@@ -25,7 +27,7 @@ async fn main() {
 
 async fn handle_conn(stream: TcpStream ) {
     let mut handler = resp::RespHandler::new(stream);
-    let mut stroge: std::collections::HashMap<String,String> = std::collections::HashMap::new();
+    let mut storage: std::collections::HashMap<String,String> = std::collections::HashMap::new();
     println!("Starting read loop");
     loop {
         let value = handler.read_value().await.unwrap();
@@ -35,6 +37,8 @@ async fn handle_conn(stream: TcpStream ) {
         match commmand.as_str() {
             "ping" => Value::SimpleSrting("PONG".to_string()),
             "echo" => args.first().unwrap().clone(),
+            "set"  => set(&mut storage, unpack_bulk_str(args[0].clone()).unwrap(), unpack_bulk_str(args[1].clone()).unwrap()),
+            "get"  => get(&mut storage, unpack_bulk_str(args[0].clone()).unwrap()),
             c=> panic!("Cannnot handle command {}", c),
             }
         } else {
@@ -43,6 +47,18 @@ async fn handle_conn(stream: TcpStream ) {
         
         println!("Sending value {:?}", response);
         handler.write_value(response).await.unwrap();
+    }
+}
+
+fn set(storage: &mut std::collections::HashMap<String,String>,key: String, value: String) -> Value{
+    storage.insert(key, value);
+    Value::SimpleSrting("OK".to_string())
+}
+
+fn get(storage: &mut std::collections::HashMap<String,String>,key: String) -> Value{
+    match storage.get(&key) {
+        Some(v) => Value::BulkString((v.to_string())),
+        None => Value::Null,
     }
 }
 
