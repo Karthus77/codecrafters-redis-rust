@@ -25,6 +25,7 @@ async fn main() {
 
 async fn handle_conn(stream: TcpStream ) {
     let mut handler = resp::RespHandler::new(stream);
+    let mut stroge: std::collections::HashMap<String,String> = std::collections::HashMap::new();
     println!("Starting read loop");
     loop {
         let value = handler.read_value().await.unwrap();
